@@ -1,0 +1,283 @@
+Option Compare Database
+
+Private Sub load_data()
+Dim sql As String
+ sql = "SELECT * FROM personaldetails ORDER BY ID  ASC"
+List29.ColumnHeads = True
+List29.ColumnCount = 22
+List29.RowSourceType = "Table/Query"
+List29.RowSource = sql
+End Sub
+
+Private Sub Command25_Click()
+  Dim searchText As String
+
+    ' Get the search text from the search box
+    searchText = Me.fnametxt.Value
+
+    ' Construct the SQL to filter the list box based on the search text
+    If Len(searchText) > 0 Then
+        strSQL = "SELECT * FROM personaldetails WHERE firstName LIKE '*" & searchText & "*'"
+    Else
+        ' If search text is empty, show all records (optional)
+        MsgBox "No records found.", vbInformation, "Search Results"
+        strSQL = "SELECT * FROM personaldetails"
+    End If
+
+    ' Apply the SQL query to the list box
+    Me.List29.RowSource = strSQL
+    Me.List29.Requery
+End Sub
+
+Private Sub Command26_Click()
+If IsNull(Me.fnametxt) Or IsNull(Me.mnametxt) Or IsNull(Me.gtxt) Then
+MsgBox "Please fill in all required fields.", vbExclamation, "Incomplete Data"
+        Exit Sub
+    End If
+    
+    ' Define database variables
+    Dim db As DAO.Database
+    Dim rs As DAO.Recordset
+    Dim strSQL As String
+    
+    ' Set database and recordset objects
+    Set db = CurrentDb
+    Set rs = db.OpenRecordset("personaldetails", dbOpenDynaset)
+    
+    ' Add a new record to the table
+    With rs
+        .AddNew
+        !firstName = Me.fnametxt
+        !middleName = Me.mnametxt
+        !sponsors = spstxt
+        !gender = gtxt
+        !mother = mthtxt
+        !father = fthtxt
+        !clan = clantxt
+        !location = locationtxt
+        !placeOfBirth = pbtxt
+        !dateOfBirth = dobtxt
+        !prayerHouse = phtxt
+        !LB_No = lbtxt
+        !LC_No = lctxt
+        !LM_No = lmtxt
+        !StatAn_a = Staatxt
+        !StatAn_p = Staptxt
+        !mortis = mortistxt
+        !dateOfBaptism = dbtxt
+        !dateOfCommunion = dctxt
+        !dateOfconfirmation = dcntxt
+        !dateOfMatr = dmtxt
+        .Update
+        .Close
+    End With
+    
+    ' Release objects
+    Set rs = Nothing
+    Set db = Nothing
+    
+    ' Clear input fields after adding record
+
+    Call Command29_Click
+    ' Optionally, display a message or perform additional actions
+    MsgBox "New record added successfully!", vbInformation, "Record Added"
+    
+
+Call load_data
+End Sub
+
+Private Sub Command29_Click()
+ 
+    ' Clear input fields after adding record
+   Me.idtxt = ""
+   Me.fnametxt = ""
+   Me.mnametxt = ""
+   Me.spstxt = ""
+   Me.gtxt = ""
+   Me.mthtxt = ""
+   Me.fthtxt = ""
+   Me.clantxt = ""
+   Me.locationtxt = ""
+   Me.pbtxt = ""
+   Me.dobtxt = ""
+   Me.phtxt = ""
+   Me.lbtxt = ""
+   Me.lctxt = ""
+   Me.lmtxt = ""
+   Me.Staatxt = ""
+   Me.Staptxt = ""
+   Me.mortistxt = ""
+   Me.dbtxt = ""
+   Me.dctxt = ""
+   Me.dcntxt = ""
+   Me.dmtxt = ""
+End Sub
+
+Private Sub Command30_Click()
+   strSQL = "UPDATE personaldetails SET " & _
+             "firstName = @firstName, " & _
+             "middleName = @middleName, " & _
+             "sponsors = @sponsors, " & _
+             "gender = @gender, " & _
+             "mother = @mother, " & _
+             "father = @father, " & _
+             "clan = @clan, " & _
+             "location = @location, " & _
+             "placeOfBirth = @placeOfBirth, " & _
+             "dateOfBirth = @dateOfBirth, " & _
+             "prayerHouse = @prayerHouse, " & _
+             "LB_No = @LB_No, " & _
+             "LC_No = @LC_No, " & _
+             "LM_No = @LM_No, " & _
+             "StatAn_a = @StatAn_a, " & _
+             "StatAn_p = @StatAn_p, " & _
+             "mortis = @mortis, " & _
+             "dateOfBaptism = @dateOfBaptism, " & _
+             "dateOfCommunion = @dateOfCommunion, " & _
+             "dateOfconfirmation = @dateOfconfirmation, " & _
+             "dateOfMatr = @dateOfMatr " & _
+             "WHERE id = @RecordID;"
+    
+    ' Define database variables
+    Dim db As DAO.Database
+    Dim qdf As DAO.QueryDef
+    
+    ' Set database object
+    Set db = CurrentDb
+    
+    ' Prepare and execute the parameterized query
+    Set qdf = db.CreateQueryDef("", strSQL)
+    qdf.Parameters("@firstName").Value = fnametxt.Value
+    qdf.Parameters("@middleName").Value = mnametxt.Value
+    qdf.Parameters("@sponsors").Value = spstxt.Value
+    qdf.Parameters("@gender").Value = gtxt.Value
+    qdf.Parameters("@mother").Value = mthtxt.Value
+    qdf.Parameters("@father").Value = fthtxt.Value
+    qdf.Parameters("@clan").Value = clantxt.Value
+    qdf.Parameters("@location").Value = location.Value
+    qdf.Parameters("@placeOfBirth").Value = pbtxt.Value
+    qdf.Parameters("@dateOfBirth").Value = dobtxt.Value
+    qdf.Parameters("@prayerHouse").Value = phtxt.Value
+    qdf.Parameters("@LB_No").Value = lbtxt.Value
+    qdf.Parameters("@LC_No").Value = lctxt.Value
+    qdf.Parameters("@LM_No").Value = lmtxt.Value
+    qdf.Parameters("@StatAn_a").Value = Staatxt.Value
+    qdf.Parameters("@StatAn_p").Value = Staptxt.Value
+    qdf.Parameters("@mortis").Value = mortistxt.Value
+    qdf.Parameters("@dateOfBaptism").Value = dbtxt.Value
+    qdf.Parameters("@dateOfCommunion").Value = dctxt.Value
+    qdf.Parameters("@dateOfconfirmation").Value = dcntxt.Value
+    qdf.Parameters("@dateOfMatr").Value = dmtxt.Value
+    qdf.Parameters("@RecordID").Value = idtxt.Value
+    
+    ' Execute the UPDATE query
+    qdf.Execute dbFailOnError
+    
+    ' Clean up
+    Set qdf = Nothing
+    Set db = Nothing
+   
+      
+  
+    ' Call the load_data subroutine to refresh the data
+ Call load_data
+  'clear the text box
+      Call Command29_Click
+End Sub
+
+
+Private Sub Command31_Click()
+Dim db As Database
+    Dim rs As Recordset
+    Dim strSQL As String
+    Dim confirmation As VbMsgBoxResult
+    
+' Check if an item is selected for deletion
+If IsNull(Me.idtxt.Value) Or Me.idtxt.Value = "" Then
+    MsgBox "Please select an item to delete.", vbExclamation, "No Item Selected"
+    Exit Sub
+End If
+
+    ' Prompt the user for confirmation
+    confirmation = MsgBox("Are you sure you want to delete this record?", vbYesNo + vbQuestion, "Confirm Delete")
+
+    If confirmation = vbYes Then
+        ' Get the current database
+        Set db = CurrentDb
+        
+        
+        
+        ' Execute the delete SQL
+        db.Execute "DELETE FROM personaldetails WHERE ID = " & Me.idtxt.Value
+        
+       
+        Call load_data
+        
+        ' Inform the user
+        MsgBox "Record deleted successfully.", vbInformation, "Delete Successful"
+    Else
+        ' User clicked No or cancelled
+        MsgBox "Delete operation cancelled.", vbExclamation, "Delete Cancelled"
+    End If
+    
+    ' Clean up
+    Set rs = Nothing
+    Set db = Nothing
+End Sub
+
+Private Sub Command33_Click()
+Dim db As DAO.Database
+Dim rs As DAO.Recordset
+Dim strSQL As String
+Dim selectedID As Long
+
+' Check if any item is selected in the list box
+If Me.List29.ItemsSelected.Count = 0 Then
+    MsgBox "Please select a record.", vbExclamation
+    ' Optionally, you can add code here to allow the user to select an item.
+    Exit Sub
+End If
+
+' Get the selected record ID from the first column of the list box
+selectedID = CLng(Me.List29.Column(0))
+
+' Open the report filtered to the selected record
+DoCmd.OpenReport "personalRecord", acViewPreview, , "ID = " & selectedID
+
+
+
+End Sub
+
+Private Sub Detail_Click()
+
+End Sub
+
+Private Sub Form_Load()
+Call load_data
+End Sub
+
+Private Sub List29_AfterUpdate()
+idtxt.Value = List29.Column(0)
+fnametxt.Value = List29.Column(1)
+mnametxt.Value = List29.Column(2)
+spstxt.Value = List29.Column(3)
+gtxt.Value = List29.Column(4)
+mthtxt.Value = List29.Column(5)
+fthtxt.Value = List29.Column(6)
+clantxt.Value = List29.Column(7)
+locationtxt.Value = List29.Column(8)
+pbtxt.Value = List29.Column(9)
+dobtxt.Value = List29.Column(10)
+phtxt.Value = List29.Column(11)
+lbtxt.Value = List29.Column(12)
+lctxt.Value = List29.Column(13)
+lmtxt.Value = List29.Column(14)
+Staatxt.Value = List29.Column(15)
+Staptxt.Value = List29.Column(16)
+mortistxt.Value = List29.Column(17)
+dbtxt.Value = List29.Column(18)
+dctxt.Value = List29.Column(19)
+dcntxt.Value = List29.Column(20)
+dmtxt.Value = List29.Column(21)
+End Sub
+
